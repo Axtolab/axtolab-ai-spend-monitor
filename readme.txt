@@ -39,6 +39,14 @@ All data stays on your site. The plugin records token counts and metadata only �
 * `aismon_retention_days` — filter the data retention window (default 90 days).
 * `aismon_dashboard_after_summary` — action to render additional dashboard panels.
 
+== Installation ==
+
+1. Install the plugin from the WordPress.org plugin directory, or upload the plugin zip via **Plugins → Add New Plugin → Upload Plugin**.
+2. Activate the plugin.
+3. Go to **Axtolab → AI Spend Monitor** in your WordPress admin to view the dashboard.
+
+The plugin needs WordPress 7.0 or newer to record AI calls — that's the version that introduced the WordPress AI Client. It activates on older versions but will not record anything until you upgrade. No API keys, no account, no setup steps required.
+
 == Frequently Asked Questions ==
 
 = Does this work without WordPress 7.0? =
@@ -81,3 +89,31 @@ This plugin is a monitor: it shows you usage and cost, and can notify you. It do
 
 = 1.0.0 =
 Initial release.
+
+== External Services ==
+
+AI Spend Monitor does **not** contact any external services. All data is recorded and stored locally in your WordPress database — no remote calls, no telemetry, no analytics.
+
+The token-to-USD cost estimates use a pricing table that ships with the plugin (no remote lookup). The table can be overridden via the `aismon_cost_rates` filter; see the developer notes in the description.
+
+The plugin does not send any data outside your WordPress site.
+
+== Privacy ==
+
+AI Spend Monitor records the following data locally, in a custom database table with the standard WordPress table prefix:
+
+* The source plugin or theme that made each AI call.
+* The AI provider (e.g. OpenAI, Anthropic, Google) and model identifier (e.g. `gpt-4o-mini`).
+* Token counts per call: prompt tokens, completion tokens, total tokens.
+* A timestamp for each recorded call.
+
+The plugin does **not** store any of the following:
+
+* Prompt or response content.
+* User identifiers, user emails, or user IP addresses.
+* Any other personally-identifying information.
+* Any visitor-facing data — the plugin only sees server-side AI calls made by other plugins or themes.
+
+Recorded data is pruned automatically after 90 days. The retention window is filterable via `aismon_retention_days`. All recorded data, plugin options, and transients are removed when the plugin is uninstalled (see `uninstall.php`).
+
+No recorded data is sent to any external service. All processing happens on your own WordPress site.
