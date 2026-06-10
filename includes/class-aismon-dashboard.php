@@ -17,11 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Aismon_Dashboard {
 
 	/**
+	 * Shared Axtolab top-level menu slug (same across all Axtolab plugins).
+	 */
+	const PARENT_MENU_SLUG = 'axtolab';
+
+	/**
 	 * Singleton instance.
 	 *
 	 * @var Aismon_Dashboard|null
 	 */
 	private static $instance = null;
+
+	/**
+	 * Hook suffix returned when the dashboard page is registered.
+	 *
+	 * @var string|false
+	 */
+	private $hook_suffix = false;
 
 	/**
 	 * Returns the singleton instance.
@@ -45,25 +57,83 @@ class Aismon_Dashboard {
 	 * @return void
 	 */
 	public function register() {
-		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		// Priority 20: after the Axtolab AI Connector (priority 10) registers
+		// the shared 'axtolab' parent menu, when it is installed.
+		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
 	/**
-	 * Adds the Tools submenu page.
+	 * Adds the dashboard under the shared Axtolab menu, creating the
+	 * top-level menu when no other Axtolab plugin has registered it.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function add_menu() {
-		add_management_page(
+		global $admin_page_hooks;
+
+		$parent_exists = ! empty( $admin_page_hooks[ self::PARENT_MENU_SLUG ] );
+
+		if ( ! $parent_exists ) {
+			add_menu_page(
+				__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
+				__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
+				'manage_options',
+				self::PARENT_MENU_SLUG,
+				array( $this, 'render' ),
+				self::menu_icon(),
+				80
+			);
+		}
+
+		$this->hook_suffix = add_submenu_page(
+			self::PARENT_MENU_SLUG,
 			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
 			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
 			'manage_options',
 			'aismon',
 			array( $this, 'render' )
 		);
+
+		// When this plugin created the parent, drop the duplicate auto-submenu
+		// entry so the sidebar shows a single "AI Spend Monitor" item.
+		if ( ! $parent_exists ) {
+			remove_submenu_page( self::PARENT_MENU_SLUG, self::PARENT_MENU_SLUG );
+		}
+	}
+
+	/**
+	 * Returns the shared Axtolab brand icon as a data URI, with a dashicon
+	 * fallback when the bundled SVG is unavailable.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string
+	 */
+	private static function menu_icon() {
+		static $cached = null;
+		if ( null !== $cached ) {
+			return $cached;
+		}
+
+		$svg_path = AISMON_PLUGIN_DIR . 'assets/axtolab-mark.svg';
+		if ( ! is_readable( $svg_path ) ) {
+			$cached = 'dashicons-chart-area';
+			return $cached;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a bundled plugin SVG asset from an internal constant path; WP_Filesystem adds overhead with no benefit for a static plugin-owned file.
+		$svg = file_get_contents( $svg_path );
+		if ( false === $svg ) {
+			$cached = 'dashicons-chart-area';
+			return $cached;
+		}
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Standard data: URI encoding of the admin-menu SVG icon (RFC 2397), not obfuscation.
+		$cached = 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		return $cached;
 	}
 
 	/**
@@ -75,7 +145,7 @@ class Aismon_Dashboard {
 	 * @return void
 	 */
 	public function enqueue( $hook_suffix ) {
-		if ( 'tools_page_aismon' !== $hook_suffix ) {
+		if ( false === $this->hook_suffix || $hook_suffix !== $this->hook_suffix ) {
 			return;
 		}
 
@@ -154,7 +224,7 @@ class Aismon_Dashboard {
 		$series  = $store->daily_series( gmdate( 'Y-m-d 00:00:00', time() - 30 * DAY_IN_SECONDS ) );
 		$recent  = $store->recent( 50 );
 
-		$base_url = admin_url( 'tools.php?page=aismon' );
+		$base_url = admin_url( 'admin.php?page=aismon' );
 		$periods  = array(
 			'month' => __( 'This month', 'axtolab-ai-spend-monitor' ),
 			'30d'   => __( 'Last 30 days', 'axtolab-ai-spend-monitor' ),

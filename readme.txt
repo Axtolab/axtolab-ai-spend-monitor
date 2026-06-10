@@ -14,7 +14,7 @@ AI usage and cost tracking for the WordPress AI Client. See which plugins make A
 
 WordPress 7.0 introduced the AI Client and the Connectors screen: you configure an AI provider API key once, and every plugin on your site can use it. What WordPress does not show you is **which plugin is spending your money**.
 
-AI Spend Monitor records every call made through the WordPress AI Client and gives you a clear dashboard under **Tools → AI Spend Monitor**:
+AI Spend Monitor records every call made through the WordPress AI Client and gives you a clear dashboard under **Axtolab → AI Spend Monitor**:
 
 * **Per-plugin AI usage** — see exactly which plugins and themes make AI calls, with calls, prompt tokens, and completion tokens for each.
 * **Estimated cost per plugin** — token counts are converted to an estimated USD cost using bundled list prices for popular OpenAI, Anthropic, and Google models.

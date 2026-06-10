@@ -78,7 +78,7 @@ class Aismon_Alerts {
 			false
 		);
 
-		wp_safe_redirect( admin_url( 'tools.php?page=aismon&aismon_saved=1' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=aismon&aismon_saved=1' ) );
 		exit;
 	}
 
@@ -128,7 +128,7 @@ class Aismon_Alerts {
 				__( 'Estimated AI spend on this site has passed $%1$s this month (your notification amount is $%2$s). This is a notification only — nothing has been blocked. Review usage by plugin: %3$s', 'axtolab-ai-spend-monitor' ),
 				number_format_i18n( $spend, 2 ),
 				number_format_i18n( $limit, 2 ),
-				admin_url( 'tools.php?page=aismon' )
+				admin_url( 'admin.php?page=aismon' )
 			)
 		);
 	}
