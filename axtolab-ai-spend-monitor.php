@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: AI Spend Monitor by Axtolab
- * Plugin URI: https://axtolab.com/ai-spend-monitor/
+ * Plugin URI: https://axtolab.com/products/
  * Description: AI usage and cost tracking for the WordPress AI Client. See which plugins make AI calls, how many tokens they use, and what it costs — per plugin, per model, per day.
  * Version: 1.0.0
  * Requires at least: 7.0
@@ -40,6 +40,8 @@ require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-alerts.php';
  * @return void
  */
 function aismon_init() {
+	load_plugin_textdomain( 'axtolab-ai-spend-monitor', false, dirname( plugin_basename( AISMON_PLUGIN_FILE ) ) . '/languages' );
+
 	Aismon_Store::instance()->maybe_upgrade();
 	Aismon_Recorder::instance()->register();
 	Aismon_Alerts::register();

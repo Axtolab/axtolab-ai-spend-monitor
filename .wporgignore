@@ -1,0 +1,31 @@
+# Single source of truth for files excluded from the WP.org zip.
+# Fed to rsync --exclude-from= by scripts/package-plugin.sh.
+.git/
+.github/
+.gitignore
+.editorconfig
+.wporgignore
+scripts/
+dist/
+tests/
+test-*.php
+composer.json
+composer.lock
+phpcs.xml.dist
+vendor/
+node_modules/
+package.json
+package-lock.json
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+docs/
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+assets/banner-*.png
+assets/icon-*.png
+assets/screenshot-*.png
+assets/ASSET-SPECS.md
