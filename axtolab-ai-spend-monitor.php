@@ -40,8 +40,6 @@ require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-alerts.php';
  * @return void
  */
 function aismon_init() {
-	load_plugin_textdomain( 'axtolab-ai-spend-monitor', false, dirname( plugin_basename( AISMON_PLUGIN_FILE ) ) . '/languages' );
-
 	Aismon_Store::instance()->maybe_upgrade();
 	Aismon_Recorder::instance()->register();
 	Aismon_Alerts::register();

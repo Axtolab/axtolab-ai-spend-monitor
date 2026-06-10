@@ -75,7 +75,11 @@ class Aismon_Recorder {
 				$usage             = $result->getTokenUsage();
 				$prompt_tokens     = (int) $usage->getPromptTokens();
 				$completion_tokens = (int) $usage->getCompletionTokens();
-				$total_tokens      = (int) $usage->getTotalTokens();
+				// Computed rather than getTotalTokens(): some providers (e.g.
+				// Gemini) include thought/cached tokens in their reported total,
+				// which diverges from core's AI Request Logs (input + output)
+				// and from how cost is calculated.
+				$total_tokens = $prompt_tokens + $completion_tokens;
 			}
 
 			if ( is_object( $result ) && method_exists( $result, 'getProviderMetadata' ) ) {

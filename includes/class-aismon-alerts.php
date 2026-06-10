@@ -126,8 +126,8 @@ class Aismon_Alerts {
 			sprintf(
 				/* translators: 1: estimated spend, 2: configured amount, 3: dashboard URL. */
 				__( 'Estimated AI spend on this site has passed $%1$s this month (your notification amount is $%2$s). This is a notification only — nothing has been blocked. Review usage by plugin: %3$s', 'axtolab-ai-spend-monitor' ),
-				number_format_i18n( $spend, 2 ),
-				number_format_i18n( $limit, 2 ),
+				number_format_i18n( $spend, ( $spend > 0 && $spend < 0.01 ) ? 4 : 2 ),
+				number_format_i18n( $limit, ( $limit > 0 && $limit < 0.01 ) ? 4 : 2 ),
 				admin_url( 'admin.php?page=aismon' )
 			)
 		);
