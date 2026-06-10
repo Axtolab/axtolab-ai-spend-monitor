@@ -1,4 +1,4 @@
-=== AI Spend Monitor by Axtolab ===
+=== Axtolab AI Spend Monitor ===
 Contributors: axtolab
 Tags: ai, cost, usage, tokens, monitoring
 Requires at least: 7.0

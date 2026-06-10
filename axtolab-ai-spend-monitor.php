@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: AI Spend Monitor by Axtolab
+ * Plugin Name: Axtolab AI Spend Monitor
  * Plugin URI: https://axtolab.com/products/
  * Description: AI usage and cost tracking for the WordPress AI Client. See which plugins make AI calls, how many tokens they use, and what it costs — per plugin, per model, per day.
  * Version: 1.0.0
