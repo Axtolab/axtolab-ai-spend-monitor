@@ -1,0 +1,65 @@
+.aismon-wrap .aismon-periods {
+	margin: 12px 0 4px;
+}
+
+.aismon-cards {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 16px 0 8px;
+}
+
+.aismon-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 14px 18px;
+	min-width: 180px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.aismon-card-label {
+	color: #646970;
+	font-size: 12px;
+}
+
+.aismon-card-value {
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.aismon-chart {
+	display: flex;
+	align-items: flex-end;
+	gap: 3px;
+	height: 120px;
+	max-width: 720px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 10px;
+	margin: 8px 0 20px;
+}
+
+.aismon-bar {
+	flex: 1 1 auto;
+	background: #2271b1;
+	border-radius: 2px 2px 0 0;
+	min-height: 2px;
+}
+
+.aismon-table {
+	max-width: 1100px;
+	margin-bottom: 24px;
+}
+
+.aismon-table .aismon-num {
+	text-align: right;
+}
+
+.aismon-footnote {
+	max-width: 760px;
+}

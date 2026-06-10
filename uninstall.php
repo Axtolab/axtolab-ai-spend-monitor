@@ -1,0 +1,21 @@
+<?php
+/**
+ * Uninstall cleanup for AI Spend Monitor.
+ *
+ * Removes the usage table and all plugin options.
+ *
+ * @package Axtolab_AI_Spend_Monitor
+ */
+
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit;
+}
+
+global $wpdb;
+
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Plugin-owned table removal on uninstall.
+$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'aismon_usage' ) );
+
+delete_option( 'aismon_schema_version' );
+
+wp_clear_scheduled_hook( 'aismon_prune_event' );
