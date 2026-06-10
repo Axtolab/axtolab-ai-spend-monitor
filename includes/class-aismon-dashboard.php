@@ -184,6 +184,12 @@ class Aismon_Dashboard {
 				echo wp_kses_post( implode( ' | ', $links ) );
 				?>
 			</ul>
+			<a
+				href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=aismon_export&aismon_period=' . $period['key'] ), 'aismon_export' ) ); ?>"
+				class="button aismon-export"
+			>
+				<?php esc_html_e( 'Export CSV', 'axtolab-ai-spend-monitor' ); ?>
+			</a>
 			<div class="clear"></div>
 
 			<div class="aismon-cards">
@@ -218,6 +224,29 @@ class Aismon_Dashboard {
 			 */
 			do_action( 'aismon_dashboard_after_summary', $totals, $period );
 			?>
+
+			<?php $alert = Aismon_Alerts::settings(); ?>
+			<h2><?php esc_html_e( 'Spend notification', 'axtolab-ai-spend-monitor' ); ?></h2>
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only confirmation flag. ?>
+			<?php if ( isset( $_GET['aismon_saved'] ) ) : ?>
+				<div class="notice notice-success inline"><p><?php esc_html_e( 'Notification settings saved.', 'axtolab-ai-spend-monitor' ); ?></p></div>
+			<?php endif; ?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="aismon-alert-form">
+				<?php wp_nonce_field( 'aismon_save_alert' ); ?>
+				<input type="hidden" name="action" value="aismon_save_alert" />
+				<p>
+					<label>
+						<?php esc_html_e( 'Email me when estimated spend this month passes $', 'axtolab-ai-spend-monitor' ); ?>
+						<input type="number" step="0.01" min="0" name="aismon_alert_usd" value="<?php echo esc_attr( $alert['monthly_usd'] > 0 ? $alert['monthly_usd'] : '' ); ?>" class="small-text" />
+					</label>
+					<label>
+						<?php esc_html_e( 'to', 'axtolab-ai-spend-monitor' ); ?>
+						<input type="email" name="aismon_alert_email" value="<?php echo esc_attr( $alert['email'] ); ?>" class="regular-text" />
+					</label>
+					<?php submit_button( __( 'Save', 'axtolab-ai-spend-monitor' ), 'secondary', 'submit', false ); ?>
+				</p>
+				<p class="description"><?php esc_html_e( 'One email per month. Leave the amount empty or 0 to disable. This is a notification only — nothing is blocked.', 'axtolab-ai-spend-monitor' ); ?></p>
+			</form>
 
 			<h2><?php esc_html_e( 'Daily estimated cost (last 30 days)', 'axtolab-ai-spend-monitor' ); ?></h2>
 			<?php $this->render_chart( $series ); ?>

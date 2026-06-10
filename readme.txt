@@ -20,6 +20,8 @@ AI Spend Monitor records every call made through the WordPress AI Client and giv
 * **Estimated cost per plugin** — token counts are converted to an estimated USD cost using bundled list prices for popular OpenAI, Anthropic, and Google models.
 * **Daily cost chart** — a 30-day view of your estimated AI spend, so a sudden spike is visible the day it happens, not when the invoice arrives.
 * **Recent call log** — the latest AI calls with source, provider, model, and token counts.
+* **CSV export** — download the recorded calls for any period for accounting or review: source plugin, provider, model, tokens, and estimated cost per call.
+* **Spend notification** — optionally get one email per month when estimated sitewide AI spend passes a dollar amount you choose.
 * **Zero configuration** — activate it and it starts recording. No API keys, no account, no setup.
 
 = How it works =
@@ -55,9 +57,13 @@ No. Only token counts, provider, model, capability, and the calling plugin are s
 
 No. Recording happens after the AI call completes and is a single local database insert. If recording ever fails, the original AI call is unaffected.
 
+= Can it alert me about spend? =
+
+Yes — set a monthly dollar amount on the dashboard and the plugin emails you once per month when estimated sitewide spend passes it. This is a notification only.
+
 = Can it block or limit AI usage? =
 
-This plugin is a monitor: it shows you usage and cost. It does not block calls or enforce budgets.
+This plugin is a monitor: it shows you usage and cost, and can notify you. It does not block calls or enforce budgets.
 
 == Screenshots ==
 
@@ -68,7 +74,7 @@ This plugin is a monitor: it shows you usage and cost. It does not block calls o
 == Changelog ==
 
 = 1.0.0 =
-* Initial release: per-plugin AI usage recording, cost estimates, daily cost chart, recent call log, 90-day retention with daily pruning.
+* Initial release: per-plugin AI usage recording, cost estimates, daily cost chart, recent call log, CSV export, monthly spend notification, 90-day retention with daily pruning.
 
 == Upgrade Notice ==
 

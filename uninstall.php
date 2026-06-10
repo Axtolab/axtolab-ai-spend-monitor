@@ -17,5 +17,6 @@ global $wpdb;
 $wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . 'aismon_usage' ) );
 
 delete_option( 'aismon_schema_version' );
+delete_option( 'aismon_alert' );
 
 wp_clear_scheduled_hook( 'aismon_prune_event' );

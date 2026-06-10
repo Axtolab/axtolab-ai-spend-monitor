@@ -2,6 +2,11 @@
 	margin: 12px 0 4px;
 }
 
+.aismon-wrap .aismon-export {
+	float: right;
+	margin-top: 8px;
+}
+
 .aismon-cards {
 	display: flex;
 	flex-wrap: wrap;

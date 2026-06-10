@@ -29,6 +29,8 @@ require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-attribution.php';
 require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-rates.php';
 require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-recorder.php';
 require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-dashboard.php';
+require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-export.php';
+require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-alerts.php';
 
 /**
  * Initializes the plugin components.
@@ -40,9 +42,11 @@ require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-dashboard.php';
 function aismon_init() {
 	Aismon_Store::instance()->maybe_upgrade();
 	Aismon_Recorder::instance()->register();
+	Aismon_Alerts::register();
 
 	if ( is_admin() ) {
 		Aismon_Dashboard::instance()->register();
+		Aismon_Export::register();
 	}
 }
 add_action( 'plugins_loaded', 'aismon_init' );
