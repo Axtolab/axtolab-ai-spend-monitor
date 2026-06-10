@@ -70,6 +70,7 @@ This plugin is a monitor: it shows you usage and cost, and can notify you. It do
 1. The AI Spend Monitor dashboard: summary cards, daily cost chart, and per-plugin usage.
 2. Usage by source — every plugin and theme that makes AI calls, with tokens and estimated cost.
 3. Recent AI calls log.
+4. Monthly spend notification and one-click CSV export.
 
 == Changelog ==
 
