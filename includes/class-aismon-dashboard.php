@@ -19,7 +19,7 @@ class Aismon_Dashboard {
 	/**
 	 * Shared Axtolab top-level menu slug (same across all Axtolab plugins).
 	 */
-	const PARENT_MENU_SLUG = 'axtolab-suite';
+	const PARENT_MENU_SLUG = 'axtolab';
 
 	/**
 	 * Singleton instance.
@@ -58,7 +58,7 @@ class Aismon_Dashboard {
 	 */
 	public function register() {
 		// Priority 20: after the Axtolab AI Connector (priority 10) registers
-		// the shared 'axtolab-suite' parent menu, when it is installed.
+		// the shared 'axtolab' parent menu, when it is installed. Same slug as the approved axtolab-ai-connector directory plugin.
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}

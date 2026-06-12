@@ -83,7 +83,7 @@ This plugin is a monitor: it shows you usage and cost, and can notify you. It do
 == Changelog ==
 
 = 1.0.1 =
-* Renamed the shared admin parent menu slug from 'axtolab' to 'axtolab-suite' (plugin review feedback: distinct registered names). Menu label and all page URLs are unchanged.
+* Review-round release. No functional changes; clarifies in code comments that the shared 'axtolab' admin parent menu is the same brand menu registered by the Axtolab AI Connector directory plugin.
 
 = 1.0.0 =
 * Initial release: per-plugin AI usage recording, cost estimates, daily cost chart, recent call log, CSV export, monthly spend notification, 90-day retention with daily pruning.
