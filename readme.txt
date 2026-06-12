@@ -4,7 +4,7 @@ Tags: ai, cost, usage, tokens, monitoring
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,9 @@ This plugin is a monitor: it shows you usage and cost, and can notify you. It do
 4. Monthly spend notification and one-click CSV export.
 
 == Changelog ==
+
+= 1.0.1 =
+* Renamed the shared admin parent menu slug from 'axtolab' to 'axtolab-suite' (plugin review feedback: distinct registered names). Menu label and all page URLs are unchanged.
 
 = 1.0.0 =
 * Initial release: per-plugin AI usage recording, cost estimates, daily cost chart, recent call log, CSV export, monthly spend notification, 90-day retention with daily pruning.
