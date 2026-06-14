@@ -73,10 +73,11 @@ class Aismon_Dashboard {
 	/**
 	 * Registers the dashboard page.
 	 *
-	 * When the Axtolab AI Connector is active, its brand menu already exists,
-	 * so we attach under it as a submenu. Otherwise we register our own
-	 * top-level menu using our prefixed page slug — we never register a
-	 * generically-named top-level menu of our own.
+	 * When the Axtolab AI Connector is active, its "Axtolab" brand menu already
+	 * exists, so we attach under it as a submenu. Otherwise we register our own
+	 * top-level "Axtolab" menu — the visible label is "Axtolab", but the menu
+	 * slug uses our own `aismon` prefix (never the bare, generic `axtolab`),
+	 * with "AI Spend Monitor" as the first item beneath it.
 	 *
 	 * @since 1.0.0
 	 *
@@ -97,14 +98,25 @@ class Aismon_Dashboard {
 			return;
 		}
 
-		$this->hook_suffix = add_menu_page(
-			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
-			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
+		// Standalone: top-level menu labelled "Axtolab" but keyed on our own
+		// prefixed slug, with "AI Spend Monitor" as the first item under it.
+		add_menu_page(
+			__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
+			__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			array( $this, 'render' ),
 			self::menu_icon(),
 			80
+		);
+
+		$this->hook_suffix = add_submenu_page(
+			self::PAGE_SLUG,
+			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
+			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
+			'manage_options',
+			self::PAGE_SLUG,
+			array( $this, 'render' )
 		);
 	}
 
