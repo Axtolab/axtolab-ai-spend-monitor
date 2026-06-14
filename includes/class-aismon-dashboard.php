@@ -17,9 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Aismon_Dashboard {
 
 	/**
-	 * Shared Axtolab top-level menu slug (same across all Axtolab plugins).
+	 * The Axtolab AI Connector's brand menu slug. We attach our page under it
+	 * when the connector is active, but we never register a generically-named
+	 * top-level menu ourselves — standalone installs get our own prefixed menu.
 	 */
-	const PARENT_MENU_SLUG = 'axtolab';
+	const CONNECTOR_MENU_SLUG = 'axtolab';
+
+	/**
+	 * Our own page slug (and the standalone top-level menu slug).
+	 */
+	const PAGE_SLUG = 'aismon';
 
 	/**
 	 * Singleton instance.
@@ -58,14 +65,18 @@ class Aismon_Dashboard {
 	 */
 	public function register() {
 		// Priority 20: after the Axtolab AI Connector (priority 10) registers
-		// the shared 'axtolab' parent menu, when it is installed. Same slug as the approved axtolab-ai-connector directory plugin.
+		// its brand menu, so we can attach as a submenu when it is present.
 		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
 	/**
-	 * Adds the dashboard under the shared Axtolab menu, creating the
-	 * top-level menu when no other Axtolab plugin has registered it.
+	 * Registers the dashboard page.
+	 *
+	 * When the Axtolab AI Connector is active, its brand menu already exists,
+	 * so we attach under it as a submenu. Otherwise we register our own
+	 * top-level menu using our prefixed page slug — we never register a
+	 * generically-named top-level menu of our own.
 	 *
 	 * @since 1.0.0
 	 *
@@ -74,34 +85,27 @@ class Aismon_Dashboard {
 	public function add_menu() {
 		global $admin_page_hooks;
 
-		$parent_exists = ! empty( $admin_page_hooks[ self::PARENT_MENU_SLUG ] );
-
-		if ( ! $parent_exists ) {
-			add_menu_page(
-				__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
-				__( 'Axtolab', 'axtolab-ai-spend-monitor' ),
+		if ( ! empty( $admin_page_hooks[ self::CONNECTOR_MENU_SLUG ] ) ) {
+			$this->hook_suffix = add_submenu_page(
+				self::CONNECTOR_MENU_SLUG,
+				__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
+				__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
 				'manage_options',
-				self::PARENT_MENU_SLUG,
-				array( $this, 'render' ),
-				self::menu_icon(),
-				80
+				self::PAGE_SLUG,
+				array( $this, 'render' )
 			);
+			return;
 		}
 
-		$this->hook_suffix = add_submenu_page(
-			self::PARENT_MENU_SLUG,
+		$this->hook_suffix = add_menu_page(
 			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
 			__( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ),
 			'manage_options',
-			'aismon',
-			array( $this, 'render' )
+			self::PAGE_SLUG,
+			array( $this, 'render' ),
+			self::menu_icon(),
+			80
 		);
-
-		// When this plugin created the parent, drop the duplicate auto-submenu
-		// entry so the sidebar shows a single "AI Spend Monitor" item.
-		if ( ! $parent_exists ) {
-			remove_submenu_page( self::PARENT_MENU_SLUG, self::PARENT_MENU_SLUG );
-		}
 	}
 
 	/**
