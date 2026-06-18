@@ -312,6 +312,50 @@ class Aismon_Store {
 	}
 
 	/**
+	 * Re-estimates the stored cost of every recorded call using the current
+	 * rate table.
+	 *
+	 * Called after a site owner edits rates so the dashboard reflects the
+	 * corrected prices for previously recorded calls, not just future ones.
+	 * Each distinct model is resolved once and updated in a single statement;
+	 * unknown models have their estimate cleared to NULL, matching the
+	 * record-time behaviour.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return void
+	 */
+	public function recompute_costs() {
+		global $wpdb;
+
+		$table = $this->table();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin-owned table; bulk re-estimate.
+		$models = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT model FROM %i', $table ) );
+
+		foreach ( (array) $models as $model ) {
+			$pair = Aismon_Rates::rate_for( $model );
+
+			if ( null === $pair ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin-owned table; bulk re-estimate.
+				$wpdb->query( $wpdb->prepare( 'UPDATE %i SET est_cost_usd = NULL WHERE model = %s', $table, $model ) );
+				continue;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin-owned table; bulk re-estimate.
+			$wpdb->query(
+				$wpdb->prepare(
+					'UPDATE %i SET est_cost_usd = ROUND( ( ( prompt_tokens * %f ) + ( completion_tokens * %f ) ) / 1000000, 6 ) WHERE model = %s',
+					$table,
+					$pair[0],
+					$pair[1],
+					$model
+				)
+			);
+		}
+	}
+
+	/**
 	 * Deletes rows older than the retention window.
 	 *
 	 * @since 1.0.0

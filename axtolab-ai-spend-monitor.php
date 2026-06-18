@@ -3,7 +3,7 @@
  * Plugin Name: Axtolab AI Spend Monitor
  * Plugin URI: https://axtolab.com/products/
  * Description: AI usage and cost tracking for the WordPress AI Client. See which plugins make AI calls, how many tokens they use, and what it costs — per plugin, per model, per day.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Requires at least: 7.0
  * Requires PHP: 7.4
  * Author: Axtolab
@@ -19,10 +19,117 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AISMON_VERSION', '1.0.0' );
+define( 'AISMON_VERSION', '1.0.1' );
 define( 'AISMON_PLUGIN_FILE', __FILE__ );
 define( 'AISMON_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AISMON_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+
+/**
+ * Returns the support inbox for plugin-row links.
+ *
+ * @since 1.0.1
+ *
+ * @return string
+ */
+function aismon_support_email() {
+	return (string) apply_filters( 'aismon_support_email', 'support@axtolab.com' );
+}
+
+/**
+ * Builds a mailto URL for support or feature-request links.
+ *
+ * @since 1.0.1
+ *
+ * @param string $subject_prefix Subject prefix.
+ * @param string $body           Optional body template.
+ * @return string
+ */
+function aismon_email_url( $subject_prefix, $body = '' ) {
+	$url = 'mailto:' . rawurlencode( aismon_support_email() )
+		. '?subject=' . rawurlencode( $subject_prefix . ': AI Spend Monitor v' . AISMON_VERSION );
+
+	if ( '' !== $body ) {
+		$url .= '&body=' . rawurlencode( $body );
+	}
+
+	return $url;
+}
+
+/**
+ * Adds Settings and Support to the Plugins screen action links.
+ *
+ * @since 1.0.1
+ *
+ * @param array $links Existing action links.
+ * @return array
+ */
+function aismon_plugin_action_links( $links ) {
+	$action_links = array(
+		'settings' => sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( admin_url( 'admin.php?page=aismon' ) ),
+			esc_html__( 'Settings', 'axtolab-ai-spend-monitor' )
+		),
+		'support'  => sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( aismon_email_url( 'Support' ) ),
+			esc_html__( 'Support', 'axtolab-ai-spend-monitor' )
+		),
+	);
+
+	return array_merge( $action_links, $links );
+}
+
+/**
+ * Adds support, forum, docs, and feature-request links to the plugin row meta.
+ *
+ * @since 1.0.1
+ *
+ * @param array  $links Existing row meta links.
+ * @param string $file  Plugin basename for the current row.
+ * @return array
+ */
+function aismon_plugin_row_meta( $links, $file ) {
+	if ( $file !== plugin_basename( AISMON_PLUGIN_FILE ) ) {
+		return $links;
+	}
+
+	$body = "Hi Axtolab,\n\n"
+		. "I'd like to suggest a feature for AI Spend Monitor.\n\n"
+		. "What I'd like to do:\n\n\n"
+		. "Why it matters / what I'm doing today instead:\n\n\n"
+		. "Thanks,\n";
+
+	$extra_links = array(
+		'email_support'   => sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( aismon_email_url( 'Support' ) ),
+			esc_html__( 'Email support', 'axtolab-ai-spend-monitor' )
+		),
+		'wporg_forum'     => sprintf(
+			'<a href="%s" target="_blank" rel="noopener">%s</a>',
+			esc_url( 'https://wordpress.org/support/plugin/axtolab-ai-spend-monitor/' ),
+			esc_html__( 'WordPress.org forum', 'axtolab-ai-spend-monitor' )
+		),
+		'docs'            => sprintf(
+			'<a href="%s" target="_blank" rel="noopener">%s</a>',
+			esc_url( 'https://axtolab.com/docs/ai-spend-monitor' ),
+			esc_html__( 'Docs', 'axtolab-ai-spend-monitor' )
+		),
+		'feature_request' => sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( aismon_email_url( 'Feature request', $body ) ),
+			esc_html__( 'Suggest a feature', 'axtolab-ai-spend-monitor' )
+		),
+	);
+
+	return array_merge( $links, $extra_links );
+}
+
+if ( is_admin() ) {
+	add_filter( 'plugin_action_links_' . plugin_basename( AISMON_PLUGIN_FILE ), 'aismon_plugin_action_links' );
+	add_filter( 'plugin_row_meta', 'aismon_plugin_row_meta', 10, 2 );
+}
 
 require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-store.php';
 require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-attribution.php';
@@ -42,6 +149,7 @@ require_once AISMON_PLUGIN_DIR . 'includes/class-aismon-alerts.php';
 function aismon_init() {
 	Aismon_Store::instance()->maybe_upgrade();
 	Aismon_Recorder::instance()->register();
+	Aismon_Rates::register();
 	Aismon_Alerts::register();
 
 	if ( is_admin() ) {

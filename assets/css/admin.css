@@ -68,3 +68,49 @@
 .aismon-footnote {
 	max-width: 760px;
 }
+
+.aismon-wrap .aismon-tabs {
+	margin-bottom: 16px;
+}
+
+.aismon-rates-intro {
+	max-width: 760px;
+	margin: 4px 0 16px;
+}
+
+.aismon-rates-group {
+	margin: 18px 0 6px;
+	font-size: 15px;
+}
+
+.aismon-rates-table {
+	max-width: 760px;
+}
+
+.aismon-rates-table input.small-text {
+	width: 90px;
+	text-align: right;
+}
+
+.aismon-rates-table .aismon-rate-overridden td {
+	background: #fcf3d7;
+}
+
+.aismon-rate-badge {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 1px 6px;
+	font-size: 11px;
+	line-height: 1.6;
+	color: #8a6d00;
+	background: #fbe9b0;
+	border-radius: 9px;
+	vertical-align: middle;
+}
+
+.aismon-rates-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 16px;
+}

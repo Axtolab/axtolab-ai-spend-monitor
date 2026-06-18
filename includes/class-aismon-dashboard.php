@@ -233,19 +233,9 @@ class Aismon_Dashboard {
 			return;
 		}
 
-		$store   = Aismon_Store::instance();
-		$period  = $this->period();
-		$totals  = $store->totals( $period['since'] );
-		$sources = $store->summary_by_source( $period['since'] );
-		$series  = $store->daily_series( gmdate( 'Y-m-d 00:00:00', time() - 30 * DAY_IN_SECONDS ) );
-		$recent  = $store->recent( 50 );
-
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tab switch.
+		$tab      = ( isset( $_GET['tab'] ) && 'rates' === sanitize_key( wp_unslash( $_GET['tab'] ) ) ) ? 'rates' : 'dashboard';
 		$base_url = admin_url( 'admin.php?page=aismon' );
-		$periods  = array(
-			'month' => __( 'This month', 'axtolab-ai-spend-monitor' ),
-			'30d'   => __( 'Last 30 days', 'axtolab-ai-spend-monitor' ),
-			'7d'    => __( 'Last 7 days', 'axtolab-ai-spend-monitor' ),
-		);
 		?>
 		<div class="wrap aismon-wrap">
 			<h1><?php esc_html_e( 'AI Spend Monitor', 'axtolab-ai-spend-monitor' ); ?></h1>
@@ -255,6 +245,32 @@ class Aismon_Dashboard {
 					<?php esc_html_e( 'The WordPress AI Client (WordPress 7.0+) is not available on this site, so no usage can be recorded yet.', 'axtolab-ai-spend-monitor' ); ?>
 				</p></div>
 			<?php endif; ?>
+
+			<h2 class="nav-tab-wrapper aismon-tabs">
+				<a href="<?php echo esc_url( $base_url ); ?>" class="nav-tab <?php echo 'dashboard' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Dashboard', 'axtolab-ai-spend-monitor' ); ?></a>
+				<a href="<?php echo esc_url( add_query_arg( 'tab', 'rates', $base_url ) ); ?>" class="nav-tab <?php echo 'rates' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Cost rates', 'axtolab-ai-spend-monitor' ); ?></a>
+			</h2>
+
+			<?php
+			if ( 'rates' === $tab ) {
+				$this->render_rates_tab();
+				echo '</div>';
+				return;
+			}
+
+			$store   = Aismon_Store::instance();
+			$period  = $this->period();
+			$totals  = $store->totals( $period['since'] );
+			$sources = $store->summary_by_source( $period['since'] );
+			$series  = $store->daily_series( gmdate( 'Y-m-d 00:00:00', time() - 30 * DAY_IN_SECONDS ) );
+			$recent  = $store->recent( 50 );
+
+			$periods = array(
+				'month' => __( 'This month', 'axtolab-ai-spend-monitor' ),
+				'30d'   => __( 'Last 30 days', 'axtolab-ai-spend-monitor' ),
+				'7d'    => __( 'Last 7 days', 'axtolab-ai-spend-monitor' ),
+			);
+			?>
 
 			<ul class="subsubsub aismon-periods">
 				<?php
@@ -403,6 +419,107 @@ class Aismon_Dashboard {
 				<?php esc_html_e( 'Costs are estimates based on published list prices per model (standard tier, no caching or batch discounts) and may differ from your provider invoice. Data is stored locally on this site; nothing is sent to any external service.', 'axtolab-ai-spend-monitor' ); ?>
 			</p>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Renders the "Cost rates" tab: an editable table of per-model prices.
+	 *
+	 * Prices are grouped by provider. Each field is pre-filled only when the
+	 * site owner has overridden it; otherwise the bundled default is shown as a
+	 * placeholder, and an empty field on save means "keep the default".
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return void
+	 */
+	private function render_rates_tab() {
+		$defaults  = Aismon_Rates::defaults();
+		$overrides = Aismon_Rates::overrides();
+		$groups    = array(
+			__( 'OpenAI', 'axtolab-ai-spend-monitor' )    => 'gpt',
+			__( 'Anthropic', 'axtolab-ai-spend-monitor' ) => 'claude',
+			__( 'Google', 'axtolab-ai-spend-monitor' )    => 'gemini',
+		);
+		?>
+		<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only confirmation flag. ?>
+		<?php if ( isset( $_GET['aismon_rates_saved'] ) ) : ?>
+			<div class="notice notice-success inline"><p><?php esc_html_e( 'Cost rates saved. Previously recorded calls were re-estimated with the new rates.', 'axtolab-ai-spend-monitor' ); ?></p></div>
+		<?php endif; ?>
+
+		<p class="description aismon-rates-intro">
+			<?php esc_html_e( 'Costs are estimated from token counts using these prices (USD per 1 million tokens, standard tier — caching and batch discounts are not modeled). Edit any price to match your provider plan or to correct for a pricing change. Leave a field blank to use the bundled default. Saving also re-estimates previously recorded calls so the dashboard reflects your rates.', 'axtolab-ai-spend-monitor' ); ?>
+		</p>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="aismon-rates-form">
+			<?php wp_nonce_field( 'aismon_save_rates' ); ?>
+			<input type="hidden" name="action" value="aismon_save_rates" />
+
+			<?php foreach ( $groups as $label => $needle ) : ?>
+				<h2 class="aismon-rates-group"><?php echo esc_html( $label ); ?></h2>
+				<table class="widefat striped aismon-table aismon-rates-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Model prefix', 'axtolab-ai-spend-monitor' ); ?></th>
+							<th class="aismon-num"><?php esc_html_e( 'Input ($ / 1M tokens)', 'axtolab-ai-spend-monitor' ); ?></th>
+							<th class="aismon-num"><?php esc_html_e( 'Output ($ / 1M tokens)', 'axtolab-ai-spend-monitor' ); ?></th>
+							<th><?php esc_html_e( 'Default', 'axtolab-ai-spend-monitor' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						foreach ( $defaults as $prefix => $pair ) :
+							if ( 0 !== strpos( $prefix, $needle ) ) {
+								continue;
+							}
+							$has_override = isset( $overrides[ $prefix ] );
+							$in_val       = $has_override ? $overrides[ $prefix ][0] : '';
+							$out_val      = $has_override ? $overrides[ $prefix ][1] : '';
+							?>
+							<tr class="<?php echo $has_override ? 'aismon-rate-overridden' : ''; ?>">
+								<td>
+									<code><?php echo esc_html( $prefix ); ?></code>
+									<?php if ( $has_override ) : ?>
+										<span class="aismon-rate-badge"><?php esc_html_e( 'custom', 'axtolab-ai-spend-monitor' ); ?></span>
+									<?php endif; ?>
+								</td>
+								<td class="aismon-num">
+									<input type="number" step="0.01" min="0" inputmode="decimal"
+										name="aismon_rate[<?php echo esc_attr( $prefix ); ?>][in]"
+										value="<?php echo esc_attr( '' === $in_val ? '' : (string) $in_val ); ?>"
+										placeholder="<?php echo esc_attr( (string) $pair[0] ); ?>"
+										class="small-text" />
+								</td>
+								<td class="aismon-num">
+									<input type="number" step="0.01" min="0" inputmode="decimal"
+										name="aismon_rate[<?php echo esc_attr( $prefix ); ?>][out]"
+										value="<?php echo esc_attr( '' === $out_val ? '' : (string) $out_val ); ?>"
+										placeholder="<?php echo esc_attr( (string) $pair[1] ); ?>"
+										class="small-text" />
+								</td>
+								<td class="description">
+									<?php
+									echo esc_html(
+										sprintf(
+											/* translators: 1: default input price, 2: default output price. */
+											__( '$%1$s in / $%2$s out', 'axtolab-ai-spend-monitor' ),
+											(string) $pair[0],
+											(string) $pair[1]
+										)
+									);
+									?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			<?php endforeach; ?>
+
+			<p class="aismon-rates-actions">
+				<?php submit_button( __( 'Save rates', 'axtolab-ai-spend-monitor' ), 'primary', 'submit', false ); ?>
+				<span class="description"><?php esc_html_e( 'Models not listed here are not cost-estimated. Unknown models show a dash in the dashboard.', 'axtolab-ai-spend-monitor' ); ?></span>
+			</p>
+		</form>
 		<?php
 	}
 

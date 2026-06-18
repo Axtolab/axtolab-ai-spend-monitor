@@ -4,7 +4,7 @@ Tags: ai, cost, usage, tokens, monitoring
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,7 @@ AI Spend Monitor records every call made through the WordPress AI Client and giv
 
 * **Per-plugin AI usage** — see exactly which plugins and themes make AI calls, with calls, prompt tokens, and completion tokens for each.
 * **Estimated cost per plugin** — token counts are converted to an estimated USD cost using bundled list prices for popular OpenAI, Anthropic, and Google models.
+* **Editable cost rates** — a "Cost rates" tab lets you adjust the per-model input/output prices to match your provider plan or a price change. Saving re-estimates previously recorded calls too, so the whole dashboard reflects your rates. No code required.
 * **Daily cost chart** — a 30-day view of your estimated AI spend, so a sudden spike is visible the day it happens, not when the invoice arrives.
 * **Recent call log** — the latest AI calls with source, provider, model, and token counts.
 * **CSV export** — download the recorded calls for any period for accounting or review: source plugin, provider, model, tokens, and estimated cost per call.
@@ -55,7 +56,7 @@ The plugin activates on older versions but can only record usage on WordPress 7.
 
 = Are the cost figures exact? =
 
-No — they are estimates. Costs are calculated from recorded token counts using published list prices per model (standard tier). Caching and batch discounts are not modeled, and providers change prices. Always treat your provider's invoice as the source of truth. You can adjust the rates with the `aismon_cost_rates` filter.
+No — they are estimates. Costs are calculated from recorded token counts using published list prices per model (standard tier). Caching and batch discounts are not modeled, and providers change prices. Always treat your provider's invoice as the source of truth. You can adjust any per-model price on the **Cost rates** tab (no code required); saving also re-estimates previously recorded calls. Developers can layer further changes on the `aismon_cost_rates` filter.
 
 = Does it record my prompts? =
 
@@ -79,13 +80,22 @@ This plugin is a monitor: it shows you usage and cost, and can notify you. It do
 2. Usage by source — every plugin and theme that makes AI calls, with tokens and estimated cost.
 3. Recent AI calls log.
 4. Monthly spend notification and one-click CSV export.
+5. The Cost rates tab: edit per-model input/output prices to match your provider plan.
 
 == Changelog ==
+
+= 1.0.1 =
+* New "Cost rates" tab: edit per-model input/output prices from the dashboard, no code required.
+* Saving rates re-estimates previously recorded calls, so existing dashboard totals reflect your prices.
+* Overrides are stored as deltas from the bundled defaults, so untouched models keep tracking future default-price updates.
 
 = 1.0.0 =
 * Initial release: per-plugin AI usage recording, cost estimates, daily cost chart, recent call log, CSV export, monthly spend notification, 90-day retention with daily pruning.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Adds an editable Cost rates tab so you can match estimates to your provider pricing without code.
 
 = 1.0.0 =
 Initial release.
